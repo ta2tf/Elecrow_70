@@ -17,37 +17,18 @@
 #include "esp_log.h"
 #include "lvgl.h"
 
+
+#include "esp_lcd_panel_io.h"
+#include "esp_lcd_panel_ops.h"
+#include "esp_lcd_touch_gt911.h"
+
+#include "driver/i2c.h"
+
 static const char *TAG = "example";
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////// Please update the following configuration according to your LCD spec //////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//#define EXAMPLE_LCD_PIXEL_CLOCK_HZ     (18 * 1000 * 1000)
-//#define EXAMPLE_LCD_BK_LIGHT_ON_LEVEL  1
-//#define EXAMPLE_LCD_BK_LIGHT_OFF_LEVEL !EXAMPLE_LCD_BK_LIGHT_ON_LEVEL
-//#define EXAMPLE_PIN_NUM_BK_LIGHT       4
-//#define EXAMPLE_PIN_NUM_HSYNC          46
-//#define EXAMPLE_PIN_NUM_VSYNC          3
-//#define EXAMPLE_PIN_NUM_DE             0
-//#define EXAMPLE_PIN_NUM_PCLK           9
-//#define EXAMPLE_PIN_NUM_DATA0          14 // B0
-//#define EXAMPLE_PIN_NUM_DATA1          13 // B1
-//#define EXAMPLE_PIN_NUM_DATA2          12 // B2
-//#define EXAMPLE_PIN_NUM_DATA3          11 // B3
-//#define EXAMPLE_PIN_NUM_DATA4          10 // B4
-//#define EXAMPLE_PIN_NUM_DATA5          39 // G0
-//#define EXAMPLE_PIN_NUM_DATA6          38 // G1
-//#define EXAMPLE_PIN_NUM_DATA7          45 // G2
-//#define EXAMPLE_PIN_NUM_DATA8          48 // G3
-//#define EXAMPLE_PIN_NUM_DATA9          47 // G4
-//#define EXAMPLE_PIN_NUM_DATA10         21 // G5
-//#define EXAMPLE_PIN_NUM_DATA11         1  // R0
-//#define EXAMPLE_PIN_NUM_DATA12         2  // R1
-//#define EXAMPLE_PIN_NUM_DATA13         42 // R2
-//#define EXAMPLE_PIN_NUM_DATA14         41 // R3
-//#define EXAMPLE_PIN_NUM_DATA15         40 // R4
-//#define EXAMPLE_PIN_NUM_DISP_EN        -1
-
 
 
 #define EXAMPLE_LCD_PIXEL_CLOCK_HZ     (16 * 1000 * 1000)
@@ -100,6 +81,70 @@ SemaphoreHandle_t sem_gui_ready;
 #endif
 
 extern void example_lvgl_demo_ui(lv_disp_t *disp);
+
+
+#define  EXAMPLE_I2C_SDA 19
+#define  EXAMPLE_I2C_SCL 20
+#define  EXAMPLE_I2C_NUM 1
+
+
+void init_i2c(void)
+{
+    ESP_LOGI(TAG, "Initialize I2C");
+
+    const i2c_config_t i2c_conf = {
+        .mode = I2C_MODE_MASTER,
+        .sda_io_num = EXAMPLE_I2C_SDA,
+        .scl_io_num = EXAMPLE_I2C_SCL,
+        .sda_pullup_en = GPIO_PULLUP_ENABLE,
+        .scl_pullup_en = GPIO_PULLUP_ENABLE,
+        .master.clk_speed = 400000,
+    };
+    /* Initialize I2C */
+    ESP_ERROR_CHECK(i2c_param_config(EXAMPLE_I2C_NUM, &i2c_conf));
+    ESP_ERROR_CHECK(i2c_driver_install(EXAMPLE_I2C_NUM, i2c_conf.mode, 0, 0, 0));
+}
+
+
+esp_lcd_touch_handle_t InitTouchPanel(void)
+{
+
+	init_i2c();
+
+    esp_lcd_touch_handle_t tp;
+
+    const esp_lcd_panel_io_i2c_config_t tp_io_config = ESP_LCD_TOUCH_IO_I2C_GT911_CONFIG();
+
+    /* Initialize touch */
+    const esp_lcd_touch_config_t tp_cfg = {
+        .x_max = EXAMPLE_LCD_H_RES,
+        .y_max = EXAMPLE_LCD_V_RES,
+        .rst_gpio_num = GPIO_NUM_NC, // Shared with LCD reset
+        .int_gpio_num = -1,
+        .levels = {
+            .reset = 0,
+            .interrupt = 0,
+        },
+        .flags = {
+            .swap_xy = 0,
+            .mirror_x = 0,
+            .mirror_y = 0,
+        },
+    };
+
+    esp_lcd_panel_io_handle_t tp_io_handle = NULL;
+
+    ESP_ERROR_CHECK(esp_lcd_new_panel_io_i2c((esp_lcd_i2c_bus_handle_t)EXAMPLE_I2C_NUM, &tp_io_config, &tp_io_handle));
+    ESP_ERROR_CHECK(esp_lcd_touch_new_i2c_gt911(tp_io_handle, &tp_cfg, &tp));
+    assert(tp);
+
+
+
+    return tp;
+}
+
+
+
 
 static bool example_on_vsync_event(esp_lcd_panel_handle_t panel, const esp_lcd_rgb_panel_event_data_t *event_data, void *user_data)
 {
@@ -221,8 +266,12 @@ void app_main(void)
     gpio_set_level(EXAMPLE_PIN_NUM_BK_LIGHT, EXAMPLE_LCD_BK_LIGHT_ON_LEVEL);
 #endif
 
+
+    esp_lcd_touch_handle_t touchpanel = InitTouchPanel();
+
     ESP_LOGI(TAG, "Initialize LVGL library");
     lv_init();
+
     void *buf1 = NULL;
     void *buf2 = NULL;
 #if CONFIG_EXAMPLE_DOUBLE_FB
@@ -265,10 +314,24 @@ void app_main(void)
     ESP_LOGI(TAG, "Display LVGL Scatter Chart");
     example_lvgl_demo_ui(disp);
 
+
+    uint16_t touch_x[1];
+    uint16_t touch_y[1];
+    uint16_t touch_strength[1];
+    uint8_t  touch_cnt = 0;
+
     while (1) {
         // raise the task priority of LVGL and/or reduce the handler period can improve the performance
         vTaskDelay(pdMS_TO_TICKS(10));
         // The task running lv_timer_handler should have lower priority than that running `lv_tick_inc`
         lv_timer_handler();
+        esp_lcd_touch_read_data(touchpanel);
+        uint8_t touchpad_pressed = esp_lcd_touch_get_coordinates(touchpanel, touch_x, touch_y, touch_strength, &touch_cnt, 1);
+
+        if (touchpad_pressed == 1)
+        {
+        	ESP_LOGI(TAG,"Display %d %d",touch_x[0], touch_y[0]);
+        }
+
     }
 }
