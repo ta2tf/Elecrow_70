@@ -9,7 +9,6 @@ ui/ui_comp_hook.c
 ui/ui_helpers.c
 ui/ui_img_flag_turkey_png.c
 
-
  
     )
 set(COMPONENT_ADD_INCLUDEDIRS "." "ui")

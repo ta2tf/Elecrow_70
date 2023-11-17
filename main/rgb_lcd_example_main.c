@@ -163,6 +163,7 @@ static void lvgl_touch_cb(lv_indev_drv_t *drv, lv_indev_data_t *data)
         data->point.x = touchpad_x[0];
         data->point.y = touchpad_y[0];
         data->state = LV_INDEV_STATE_PRESSED;
+        ESP_LOGI(TAG,"Touch X:%d  Y:%d",touchpad_x[0], touchpad_y[0]);
     }
     else
     {
@@ -352,7 +353,7 @@ void app_main(void)
     ESP_ERROR_CHECK(esp_timer_start_periodic(lvgl_tick_timer, EXAMPLE_LVGL_TICK_PERIOD_MS * 1000));
 
     ESP_LOGI(TAG, "Display LVGL Scatter Chart");
-    example_lvgl_demo_ui(disp);
+  //  example_lvgl_demo_ui(disp);
 
 
     uint16_t touch_x[1];
@@ -367,13 +368,7 @@ void app_main(void)
         vTaskDelay(pdMS_TO_TICKS(10));
         // The task running lv_timer_handler should have lower priority than that running `lv_tick_inc`
         lv_timer_handler();
-        esp_lcd_touch_read_data(touchpanel);
-        uint8_t touchpad_pressed = esp_lcd_touch_get_coordinates(touchpanel, touch_x, touch_y, touch_strength, &touch_cnt, 1);
 
-        if (touchpad_pressed == 1)
-        {
-        	ESP_LOGI(TAG,"Display %d %d",touch_x[0], touch_y[0]);
-        }
 
     }
 }
