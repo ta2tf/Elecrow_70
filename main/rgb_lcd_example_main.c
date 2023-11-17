@@ -24,6 +24,8 @@
 
 #include "driver/i2c.h"
 
+#include "ui/ui.h"
+
 static const char *TAG = "example";
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -144,6 +146,30 @@ esp_lcd_touch_handle_t InitTouchPanel(void)
 }
 
 
+static void lvgl_touch_cb(lv_indev_drv_t *drv, lv_indev_data_t *data)
+{
+    uint16_t touchpad_x[1] = { 0 };
+    uint16_t touchpad_y[1] = { 0 };
+    uint8_t touchpad_cnt = 0;
+
+    /* Read touch controller data */
+    esp_lcd_touch_read_data((esp_lcd_touch_handle_t)drv->user_data);
+
+    /* Get coordinates */
+    bool touchpad_pressed = esp_lcd_touch_get_coordinates((esp_lcd_touch_handle_t)drv->user_data, touchpad_x, touchpad_y, NULL, &touchpad_cnt, 1);
+
+    if (touchpad_pressed && touchpad_cnt > 0)
+    {
+        data->point.x = touchpad_x[0];
+        data->point.y = touchpad_y[0];
+        data->state = LV_INDEV_STATE_PRESSED;
+    }
+    else
+    {
+        data->state = LV_INDEV_STATE_RELEASED;
+    }
+}
+
 
 
 static bool example_on_vsync_event(esp_lcd_panel_handle_t panel, const esp_lcd_rgb_panel_event_data_t *event_data, void *user_data)
@@ -183,6 +209,9 @@ void app_main(void)
 {
     static lv_disp_draw_buf_t disp_buf; // contains internal graphic buffer(s) called draw buffer(s)
     static lv_disp_drv_t disp_drv;      // contains callback functions
+
+
+
 
 #if CONFIG_EXAMPLE_AVOID_TEAR_EFFECT_WITH_SEM
     ESP_LOGI(TAG, "Create semaphores");
@@ -301,6 +330,17 @@ void app_main(void)
 #endif
     lv_disp_t *disp = lv_disp_drv_register(&disp_drv);
 
+
+    static lv_indev_drv_t indev_drv; // Input device driver (Touch)
+    lv_indev_drv_init(&indev_drv);
+    indev_drv.type = LV_INDEV_TYPE_POINTER;
+    indev_drv.disp = disp;
+    indev_drv.read_cb = lvgl_touch_cb;
+    indev_drv.user_data = touchpanel;
+
+    lv_indev_drv_register(&indev_drv);
+
+
     ESP_LOGI(TAG, "Install LVGL tick timer");
     // Tick interface for LVGL (using esp_timer to generate 2ms periodic event)
     const esp_timer_create_args_t lvgl_tick_timer_args = {
@@ -319,6 +359,8 @@ void app_main(void)
     uint16_t touch_y[1];
     uint16_t touch_strength[1];
     uint8_t  touch_cnt = 0;
+
+    ui_init();
 
     while (1) {
         // raise the task priority of LVGL and/or reduce the handler period can improve the performance
