@@ -30,6 +30,26 @@ lv_obj_set_y( ui_Slider1, -124 );
 lv_obj_set_align( ui_Slider1, LV_ALIGN_CENTER );
 
 
+ui_Image1 = lv_img_create(ui_Screen1);
+lv_img_set_src(ui_Image1, &ui_img_flag_turkey_png);
+lv_obj_set_width( ui_Image1, LV_SIZE_CONTENT);  /// 1
+lv_obj_set_height( ui_Image1, LV_SIZE_CONTENT);   /// 1
+lv_obj_set_x( ui_Image1, 178 );
+lv_obj_set_y( ui_Image1, 12 );
+lv_obj_set_align( ui_Image1, LV_ALIGN_CENTER );
+lv_obj_add_flag( ui_Image1, LV_OBJ_FLAG_ADV_HITTEST );   /// Flags
+lv_obj_clear_flag( ui_Image1, LV_OBJ_FLAG_SCROLLABLE );    /// Flags
+
+ui_Button2 = lv_btn_create(ui_Screen1);
+lv_obj_set_width( ui_Button2, 100);
+lv_obj_set_height( ui_Button2, 50);
+lv_obj_set_x( ui_Button2, 231 );
+lv_obj_set_y( ui_Button2, 154 );
+lv_obj_set_align( ui_Button2, LV_ALIGN_CENTER );
+lv_obj_add_flag( ui_Button2, LV_OBJ_FLAG_SCROLL_ON_FOCUS );   /// Flags
+lv_obj_clear_flag( ui_Button2, LV_OBJ_FLAG_SCROLLABLE );    /// Flags
+
 lv_obj_add_event_cb(ui_Button1, ui_event_Button1, LV_EVENT_ALL, NULL);
+lv_obj_add_event_cb(ui_Button2, ui_event_Button2, LV_EVENT_ALL, NULL);
 
 }

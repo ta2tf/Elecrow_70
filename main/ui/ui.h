@@ -14,6 +14,7 @@ extern "C" {
 
 #include "ui_helpers.h"
 #include "ui_events.h"
+void rotate_Animation( lv_obj_t *TargetObject, int delay);
 // SCREEN: ui_Screen1
 void ui_Screen1_screen_init(void);
 extern lv_obj_t *ui_Screen1;
@@ -21,8 +22,17 @@ void ui_event_Button1( lv_event_t * e);
 extern lv_obj_t *ui_Button1;
 extern lv_obj_t *ui_Label1;
 extern lv_obj_t *ui_Slider1;
+extern lv_obj_t *ui_Image1;
+void ui_event_Button2( lv_event_t * e);
+extern lv_obj_t *ui_Button2;
+// SCREEN: ui_Screen2
+void ui_Screen2_screen_init(void);
+extern lv_obj_t *ui_Screen2;
+void ui_event_Button3( lv_event_t * e);
+extern lv_obj_t *ui_Button3;
 extern lv_obj_t *ui____initial_actions0;
 
+LV_IMG_DECLARE( ui_img_flag_turkey_png);   // assets\flag_turkey.png
 
 
 
