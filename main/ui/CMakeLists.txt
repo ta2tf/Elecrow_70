@@ -1,8 +1,38 @@
-SET(SOURCES ui_Screen1.c
-    ui_Screen2.c
+SET(SOURCES ui_Screen_1_Print.c
+    ui_Screen_2_Move.c
+    ui_Screen_3_Setting.c
     ui.c
     ui_comp_hook.c
     ui_helpers.c
-    ui_img_flag_turkey_png.c)
+    ui_img_3d_printer_bg_png.c
+    ui_img_icn_wifi_png.c
+    ui_img_icn_pc_png.c
+    ui_img_icn_usb_png.c
+    ui_img_btn_print_png.c
+    ui_img_btn_move_png.c
+    ui_img_btn_setting_png.c
+    ui_img_print_view_bg_png.c
+    ui_img_print_view_front_png.c
+    ui_img_icn_time_1_png.c
+    ui_img_icn_time_2_png.c
+    ui_img_icn_head_png.c
+    ui_img_icn_bed_png.c
+    ui_img_btn_print_down_png.c
+    ui_img_btn_print_top_off_png.c
+    ui_img_icn_pause_png.c
+    ui_img_icn_stop_png.c
+    ui_img_btn_z_botton_png.c
+    ui_img_btn_z_top_png.c
+    ui_img_arrow_up_png.c
+    ui_img_arrow_down_png.c
+    ui_img_btn_pad_bottom_png.c
+    ui_img_btn_pad_top_png.c
+    ui_img_arrow_left_png.c
+    ui_img_arrow_right_png.c
+    ui_img_roller_bg_png.c
+    ui_img_btn_main_off_png.c
+    ui_img_btn_main_on_png.c
+    fonts/ui_font_Small_Font.c
+    fonts/ui_font_fontmontserrat26.c)
 
 add_library(ui ${SOURCES})
