@@ -1,0 +1,22 @@
+ idf_component_register(
+    SRCS rgb_lcd_example_main.c
+         lvgl_demo_ui.c
+
+
+ui/ui_Screen_2_Move.c
+ui/ui.c
+ui/ui_comp_hook.c
+ui/ui_helpers.c
+ui/ui_img_bg_png.c
+ui/ui_img_btn_pad_bottom_png.c
+ui/ui_img_btn_pad_top_png.c
+ui/ui_img_arrow_up_png.c
+ui/ui_img_arrow_down_png.c
+ui/ui_img_arrow_left_png.c
+ui/ui_img_arrow_right_png.c
+
+
+ 
+    )
+set(COMPONENT_ADD_INCLUDEDIRS "." "ui")
+ target_compile_options(${COMPONENT_LIB} PRIVATE "-Wno-format")

@@ -89,6 +89,7 @@ extern void example_lvgl_demo_ui(lv_disp_t *disp);
 #define  EXAMPLE_I2C_SCL 20
 #define  EXAMPLE_I2C_NUM 1
 
+lv_obj_t * ui_image2;
 
 void init_i2c(void)
 {
@@ -205,6 +206,28 @@ static void example_increase_lvgl_tick(void *arg)
     /* Tell LVGL how many milliseconds has elapsed */
     lv_tick_inc(EXAMPLE_LVGL_TICK_PERIOD_MS);
 }
+
+
+
+static const lv_img_dsc_t * anim_imgs[6] = {
+    &ui_img_se1_png,
+    &ui_img_se2_png,
+    &ui_img_se3_png,
+    &ui_img_se4_png,
+    &ui_img_se4_png,
+    &ui_img_se6_png,	
+ 
+};
+ 
+void lv_example_animimg_1(void)
+{
+
+    lv_animimg_set_src(ui_image2, (const void **) anim_imgs, 6);
+    lv_animimg_set_duration(ui_image2, 1000);
+    lv_animimg_set_repeat_count(ui_image2, LV_ANIM_REPEAT_INFINITE);
+    lv_animimg_start(ui_image2);
+}
+
 
 void app_main(void)
 {
@@ -362,12 +385,20 @@ void app_main(void)
     uint8_t  touch_cnt = 0;
 
     ui_init();
-
+	ui_image2 = lv_animimg_create(lv_scr_act());
+    lv_obj_center(ui_image2);
+	
+    lv_example_animimg_1();
+int x=0;
     while (1) {
+		x++;
         // raise the task priority of LVGL and/or reduce the handler period can improve the performance
         vTaskDelay(pdMS_TO_TICKS(10));
         // The task running lv_timer_handler should have lower priority than that running `lv_tick_inc`
         lv_timer_handler();
+
+lv_obj_set_x( ui_image2, 500-x );
+lv_obj_set_y( ui_image2, 100 );
 
 
     }
