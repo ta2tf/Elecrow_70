@@ -209,20 +209,21 @@ static void example_increase_lvgl_tick(void *arg)
 
 
 
-static const lv_img_dsc_t * anim_imgs[6] = {
+const lv_img_dsc_t * anim_imgs[6] = {
     &ui_img_se1_png,
     &ui_img_se2_png,
     &ui_img_se3_png,
     &ui_img_se4_png,
     &ui_img_se4_png,
-    &ui_img_se6_png,	
- 
+    &ui_img_se6_png	
 };
+
+
  
 void lv_example_animimg_1(void)
 {
 
-    lv_animimg_set_src(ui_image2, (const void **) anim_imgs, 6);
+    lv_animimg_set_src(ui_image2, (lv_img_dsc_t **) anim_imgs, 6);
     lv_animimg_set_duration(ui_image2, 1000);
     lv_animimg_set_repeat_count(ui_image2, LV_ANIM_REPEAT_INFINITE);
     lv_animimg_start(ui_image2);
