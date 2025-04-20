@@ -89,6 +89,7 @@ extern void example_lvgl_demo_ui(lv_disp_t *disp);
 #define  EXAMPLE_I2C_SCL 20
 #define  EXAMPLE_I2C_NUM 1
 
+lv_obj_t * ui_image1;
 lv_obj_t * ui_image2;
 
 void init_i2c(void)
@@ -209,13 +210,29 @@ static void example_increase_lvgl_tick(void *arg)
 
 
 
-const lv_img_dsc_t * anim_imgs[6] = {
-    &ui_img_se1_png,
-    &ui_img_se2_png,
-    &ui_img_se3_png,
-    &ui_img_se4_png,
-    &ui_img_se4_png,
-    &ui_img_se6_png	
+const lv_img_dsc_t * anim_imgs[10] = {
+    &ui_img_e1_png,
+    &ui_img_e2_png,
+    &ui_img_e3_png,
+    &ui_img_e4_png,
+    &ui_img_e5_png,
+    &ui_img_e6_png,
+    &ui_img_e7_png,
+    &ui_img_e8_png,
+    &ui_img_e9_png,
+    &ui_img_e10_png
+    	
+};
+
+
+ 
+const lv_img_dsc_t * anim_imgs2[6] = {
+    &ui_img_s1_png,
+    &ui_img_s2_png,
+    &ui_img_s3_png,
+    &ui_img_s5_png,
+    &ui_img_s4_png,
+    &ui_img_s6_png	
 };
 
 
@@ -224,9 +241,20 @@ void lv_example_animimg_1(void)
 {
 
     lv_animimg_set_src(ui_image2, (lv_img_dsc_t **) anim_imgs, 6);
-    lv_animimg_set_duration(ui_image2, 1000);
+    lv_animimg_set_duration(ui_image2, 500);
     lv_animimg_set_repeat_count(ui_image2, LV_ANIM_REPEAT_INFINITE);
     lv_animimg_start(ui_image2);
+}
+
+
+
+void lv_example_animimg_2(void)
+{
+
+    lv_animimg_set_src(ui_image1, (lv_img_dsc_t **) anim_imgs2, 6);
+    lv_animimg_set_duration(ui_image1, 500);
+    lv_animimg_set_repeat_count(ui_image1, LV_ANIM_REPEAT_INFINITE);
+    lv_animimg_start(ui_image1);
 }
 
 
@@ -390,6 +418,13 @@ void app_main(void)
     lv_obj_center(ui_image2);
 	
     lv_example_animimg_1();
+    
+    ui_image1 = lv_animimg_create(lv_scr_act());
+    lv_obj_center(ui_image1);
+	
+    lv_example_animimg_2();
+    
+    
 int x=0;
     while (1) {
 		x++;
